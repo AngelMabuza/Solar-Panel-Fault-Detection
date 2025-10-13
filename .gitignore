@@ -8,6 +8,7 @@ __pycache__/
 # Data files
 Data/*
 !Data/.gitkeep
+
 # Distribution / packaging
 .Python
 build/
