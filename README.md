@@ -12,6 +12,7 @@ The methodology follows a **two-stage computer vision pipeline**:
 
 ## Datasets
 -We will utilize the multi-resolution [dataset](https://zenodo.org/records/5171712) for photovoltaic panel segmentation from satellite and aerial imagery. 
+
 -The dataset includes three groups of PV samples collected at the spatial resolution of 0.8m, 0.3m and 0.1m and total size of the data is  about 7GB.
 
 ---
