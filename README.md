@@ -4,8 +4,8 @@
 The project replicates the results of [Rudro et al., 2024](https://doi.org/10.1016/j.egyr.2024.07.044). The main goal is to develop the proposed **SPF-Net** model to detect and monitor solar panel faults in real-time and benchmark it against existing pre-trained models.
  
 The methodology follows a **two-stage computer vision pipeline**:
-1. **Segmentation** – U-Net with MobileNetV2 encoder isolates PV regions in satellite imagery.
-2. **Classification** – InceptionV3-based classifier (with SE blocks and residual connections) categorizes panel surface conditions.
+1. **Segmentation**: U-Net with MobileNetV2 encoder isolates PV regions in satellite imagery.
+2. **Classification**: InceptionV3-based classifier (with SE blocks and residual connections) categorizes panel surface conditions.
 
 
 ---
@@ -37,7 +37,7 @@ The methodology follows a **two-stage computer vision pipeline**:
 
 ---
 
-## ⚙️ Training Protocol
+## Training Protocol
 - **Split**: 60/20/20 (train/val/test)  
 - **Optimizer**: Adam (lr = 1e-4)  
 - **Losses**:  
@@ -56,5 +56,5 @@ Replication targets reported ranges:
 
 ---
 
-## 📂 Repository Structure
+## Repository Structure
 -Benchmark models are set in various .ipynb files
