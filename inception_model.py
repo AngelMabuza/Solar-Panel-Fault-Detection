@@ -2,7 +2,7 @@ from keras.models import Model
 from keras.layers import concatenate, Conv2D, MaxPool2D, Input, GlobalAveragePooling2D, AveragePooling2D, Dense, Dropout, Activation, Flatten, BatchNormalization
 
 
-def InceptionV3():
+def InceptionV3(num_classes=1000):
     input_layer = Input(shape=(299, 299, 3))
     x = StemBlock(input_layer)
     x = InceptionBlock_A(prev_layer=x, nbr_kernels=32)
@@ -19,7 +19,7 @@ def InceptionV3():
     x = GlobalAveragePooling2D()(x)
     x = Dense(units=2048, activation='relu')(x)
     x = Dropout(rate=0.2)(x)
-    x = Dense(units=1000, activation='softmax')(x)
+    x = Dense(units=num_classes, activation='softmax')(x)
     model = Model(inputs=input_layer, outputs=x, name='Inception-V3')
     return model
 
@@ -116,5 +116,5 @@ def auxiliary_classifier(prev_Layer):
     x = Flatten()(x)
     x = Dense(units=768, activation='relu')(x)
     x = Dropout(rate=0.2)(x)
-    x = Dense(units=1000, activation='softmax')(x)
+    x = Dense(units=num_classes, activation='softmax')(x)
     return x
