@@ -1,0 +1,6 @@
+# Example config (documentary only; scripts use CLI flags)
+epochs: 8
+batch: 24
+img: 128
+lr: 1.0e-4
+model: unet_mobilenetv2

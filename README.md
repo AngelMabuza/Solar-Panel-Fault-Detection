@@ -1,61 +1,95 @@
-# Solar-Panel-Fault-Detection
+# SPF‑Net Replication (Segmentation + Classification)
 
-## Project Overview
-The project replicates the results of [Rudro et al., 2024](https://doi.org/10.1016/j.egyr.2024.07.044). The main goal is to develop the proposed **SPF-Net** model to detect and monitor solar panel faults in real-time and benchmark it against existing pre-trained models.
- 
-The methodology follows a **two-stage computer vision pipeline**:
-1. **Segmentation**: U-Net with MobileNetV2 encoder isolates PV regions in satellite imagery.
-2. **Classification**: InceptionV3-based classifier (with SE blocks and residual connections) categorizes panel surface conditions.
+This repository scaffolds a reproducible replication of the paper's methodology:
+- U‑Net (MobileNetV2 encoder) for segmentation (IoU/Dice trends, qualitative masks)
+- Multiple CNN baselines + proposed InceptionV3‑Net (with SE blocks & residuals) for 6‑class panel fault classification
+- 60/20/20 **stratified** splits preserved per class
+- Logging to `reports/` (tables/figs/logs) with LaTeX-ready exports
 
+## 1) Environment
+Choose one:
+```bash
+# Conda (recommended)
+conda env create -f environment.yml
+conda activate spfn
+
+# or pip
+python -m venv .venv && source .venv/bin/activate  # (Windows: .venv\Scripts\activate)
+pip install -r requirements.txt
+```
+> Tested with Python 3.11, TensorFlow 2.15+.
+
+## 2) Expected data layout
+```
+data/
+  segmentation/
+    images/            # *.jpg|png (RGB)
+    masks/             # *.png     (single-channel binary; same basename as images)
+  classification/
+    images/
+      Clean/ *.jpg
+      Dusty/ *.jpg
+      Bird-drop/ *.jpg
+      Electrical-damage/ *.jpg
+      Physical-Damage/ *.jpg
+      Snow-Covered/ *.jpg
+```
+
+## 3) Make stratified splits (60/20/20)
+```bash
+# Classification
+python -m src.data_prep.make_splits \
+  --mode cls \
+  --root data/classification/images \
+  --out data/classification/splits.csv
+
+# Segmentation
+python -m src.data_prep.make_splits \
+  --mode seg \
+  --root data/segmentation \
+  --out data/segmentation/splits.csv
+```
+
+## 4) Train & evaluate
+**Segmentation (U‑Net MobileNetV2):**
+```bash
+python -m src.seg.train_seg \
+  --csv data/segmentation/splits.csv \
+  --out reports/seg_unet \
+  --epochs 8 --batch 24 --img 128
+
+python -m src.seg.eval_seg \
+  --csv data/segmentation/splits.csv \
+  --model reports/seg_unet/best.keras \
+  --out reports/seg_unet/eval
+```
+
+**Classification (Baselines & Proposed):**
+```bash
+# e.g., InceptionV3‑Net (proposed)
+python -m src.cls.train_cls \
+  --csv data/classification/splits.csv \
+  --model_name inceptionv3_net_proposed \
+  --out reports/cls_incv3p \
+  --epochs 30 --batch 32 --img 256
+
+# Evaluate on test set + export confusion matrix & LaTeX tables
+python -m src.cls.eval_cls \
+  --csv data/classification/splits.csv \
+  --model reports/cls_incv3p/best.keras \
+  --out reports/cls_incv3p/eval
+```
+
+## 5) Outputs
+- `reports/**/history.csv` — per‑epoch metrics
+- `reports/**/test_metrics.json` — final test set metrics
+- `reports/**/confusion_matrix.png` — classification
+- `reports/**/tables/*.tex` — LaTeX tables matching paper’s summaries
+
+## 6) Repro tips
+- Fix seeds via `--seed` (training scripts do this for TF/Numpy/Python).
+- Ensure **no leakage**: splits script guards by filename basenames.
+- If MobileNetV3 is unavailable in your TF build, skip that baseline or switch to Small/Large variants.
 
 ---
-
-## Datasets
--We will utilize the multi-resolution [dataset](https://zenodo.org/records/5171712) for photovoltaic panel segmentation from satellite and aerial imagery. 
-
--The dataset includes three groups of PV samples collected at the spatial resolution of 0.8m, 0.3m and 0.1m and total size of the data is  about 7GB.
-
----
-## Methodology
-
-
-### Stage 1: Segmentation
-- **Model**: U-Net with MobileNetV2 encoder  
-- **Input**: 256×256 RGB images  
-- **Output**: 128×128 binary mask (PV vs background)  
-- **Metrics**: Dice coefficient, Intersection-over-Union (IoU), binary accuracy  
-
-### Stage 2: Classification
-- **Model**: InceptionV3 backbone + SE blocks + residual connections  
-- **Classes**:  
-  - Clean  
-  - Dusty  
-  - Bird droppings  
-  - Electrical damage  
-  - Physical damage  
-  - Snow-covered  
-- **Metrics**: Accuracy, Precision, Recall, Macro-F1  
-
----
-
-## Training Protocol
-- **Split**: 60/20/20 (train/val/test)  
-- **Optimizer**: Adam (lr = 1e-4)  
-- **Losses**:  
-  - Segmentation – Binary cross-entropy  
-  - Classification – Categorical cross-entropy  
-- **Evaluation**: Per-epoch logging of IoU, Dice, Accuracy, Precision, Recall, F1  
-
----
-
-## Expected Performance
-Replication targets reported ranges:
-- Segmentation IoU ≈ 0.76  
-- Classification Validation Accuracy ≈ 98.3%  
-- Test Accuracy ≈ 94.4%  
-- Macro-F1 ≈ 0.94  
-
----
-
-## Repository Structure
--Benchmark models are set in various .ipynb files
+Happy replicating!

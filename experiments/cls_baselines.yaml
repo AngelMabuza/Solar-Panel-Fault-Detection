@@ -1,0 +1,14 @@
+# Example config (documentary only; scripts use CLI flags)
+epochs: 30
+batch: 32
+img: 256
+lr: 1.0e-4
+models:
+  - densenet
+  - mobilenetv3
+  - vgg19
+  - cnn_plain
+  - vgg16
+  - resnet50
+  - inceptionv3_base
+  - inceptionv3_net_proposed
