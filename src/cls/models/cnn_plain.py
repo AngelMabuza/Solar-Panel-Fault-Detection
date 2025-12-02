@@ -23,8 +23,10 @@ def build_cnn_plain(
     x = layers.Rescaling(1.0 / 255.0, name="rescale")(x)
 
     # Your original blocks (kept as-is)
-    for f in [32, 64, 128, 256]:
-        x = layers.Conv2D(f, 3, padding="same", activation="relu")(x)
+    for f in [32, 64, 128]:  # Reduced a block - 256
+        x = layers.Conv2D(f, 3, padding="same")(x)
+        x = layers.BatchNormalization()(x)  # New
+        x = layers.Activation("relu")(x)  # New
         x = layers.MaxPooling2D()(x)
 
     # Head
@@ -36,14 +38,17 @@ def build_cnn_plain(
     model = Model(inputs, out, name="cnn_plain")
 
     # Pick the right loss for your label encoding
-    loss = "sparse_categorical_crossentropy" if labels_are_integers else "categorical_crossentropy"
+    loss = (
+        "sparse_categorical_crossentropy" if labels_are_integers
+        else "categorical_crossentropy"
+    )
     opt = tf.keras.optimizers.Adam(learning_rate=lr)
     model.compile(optimizer=opt, loss=loss, metrics=["accuracy"])
     return model
 
-# Compatibility aliases (some trainers call build_model / build_plain_cnn)
+
 def build_model(**kwargs) -> tf.keras.Model:
     return build_cnn_plain(**kwargs)
-
+    
 def build_plain_cnn(**kwargs) -> tf.keras.Model:
     return build_cnn_plain(**kwargs)

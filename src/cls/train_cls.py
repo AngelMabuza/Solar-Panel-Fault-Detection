@@ -73,7 +73,7 @@ def main():
     os.makedirs(args.out, exist_ok=True)
     set_global_seed(args.seed)
 
-    df = pd.read_csv(args.csv)
+    df = pd.read_csv(args.csv, sep=';')  # added sep param
     encoder = LabelEncoder()
     encoder.fit(sorted(df["label"].unique()))
     with open(os.path.join(args.out, "labels.json"), "w") as f:

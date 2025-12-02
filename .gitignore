@@ -210,3 +210,26 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Project-specific: ignore model outputs, reports and large images that should not be in VCS
+reports/
+reports/**
+reports/*
+
+# Machine learning model files (use LFS if you want to track them)
+*.keras
+*.h5
+*.ckpt
+*.pth
+*.pt
+
+# Training runs & logs
+runs/
+logs/
+*.log
+
+# Large image datasets that should be kept outside the repo (or tracked with LFS)
+classification/images/
+classification/images/**
+data/raw/
+data/*.zip
