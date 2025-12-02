@@ -20,9 +20,9 @@ def build_cnn_plain(
     inputs = layers.Input(shape=input_shape, name="input")
     x = inputs
     # (Optional but helpful) normalize raw images
-    x = layers.Rescaling(1.0 / 255.0, name="rescale")(x)
-
+    # x = layers.Rescaling(1.0 / 255.0, name="rescale")(x)
     # Your original blocks (kept as-is)
+
     for f in [32, 64, 128]:  # Reduced a block - 256
         x = layers.Conv2D(f, 3, padding="same")(x)
         x = layers.BatchNormalization()(x)  # New
@@ -49,6 +49,6 @@ def build_cnn_plain(
 
 def build_model(**kwargs) -> tf.keras.Model:
     return build_cnn_plain(**kwargs)
-    
+
 def build_plain_cnn(**kwargs) -> tf.keras.Model:
     return build_cnn_plain(**kwargs)
