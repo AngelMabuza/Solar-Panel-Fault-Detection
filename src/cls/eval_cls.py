@@ -25,7 +25,7 @@ def main():
     args = parse_args()
     os.makedirs(args.out, exist_ok=True)
 
-    df = pd.read_csv(args.csv)
+    df = pd.read_csv(args.csv, sep=';')  # added sep param
     labels = sorted(df["label"].unique())
     enc = LabelEncoder().fit(labels)
 

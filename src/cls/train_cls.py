@@ -40,12 +40,14 @@ def parse_args():
     ap.add_argument("--seed", type=int, default=42)
     return ap.parse_args()
 
+
 def load_image(fp, img_size):
     img = tf.io.read_file(fp)
     img = tf.image.decode_image(img, channels=3, expand_animations=False)
     img = tf.image.resize(img, (img_size, img_size))
-    img = tf.cast(img, tf.float32) / 255.0
+    img = tf.cast(img, tf.float32)/255
     return img
+
 
 def augment(img):
     img = tf.image.random_flip_left_right(img)
@@ -72,8 +74,10 @@ def main():
     args = parse_args()
     os.makedirs(args.out, exist_ok=True)
     set_global_seed(args.seed)
-
-    df = pd.read_csv(args.csv)
+    try:
+        df = pd.read_csv(args.csv, sep=',')
+    except:
+        df = pd.read_csv(args.csv, sep=';')
     encoder = LabelEncoder()
     encoder.fit(sorted(df["label"].unique()))
     with open(os.path.join(args.out, "labels.json"), "w") as f:
@@ -92,6 +96,7 @@ def main():
     ]
     history = model.fit(train_ds, validation_data=val_ds, epochs=args.epochs, callbacks=cbs)
     model.save(os.path.join(args.out, "last.keras"))
+ 
 
 if __name__ == "__main__":
     main()
