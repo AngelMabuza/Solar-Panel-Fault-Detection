@@ -14,7 +14,7 @@ def is_image_file(fname):
     return os.path.splitext(fname)[1].lower() in IMAGE_EXTS
 
 
-def count_images(base_dir='data/classification/images'):
+def count_images(base_dir='data/seg'):
     counts = OrderedDict()
     if not os.path.isdir(base_dir):
         raise FileNotFoundError(f"Base directory not found: {base_dir}")
@@ -32,7 +32,7 @@ def count_images(base_dir='data/classification/images'):
     return counts
 
 
-def save_counts_csv(counts, out_csv='reports/class_counts.csv'):
+def save_counts_csv(counts, out_csv='reports/seg_counts.csv'):
     os.makedirs(os.path.dirname(out_csv), exist_ok=True)
     with open(out_csv, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
@@ -42,9 +42,8 @@ def save_counts_csv(counts, out_csv='reports/class_counts.csv'):
 
 
 def plot_counts(counts, out_png='reports/class_distribution.png'):
-    os.makedirs(os.path.dirname(out_png), exist_ok=True)
-    classes = list(counts.keys())
-    values = list(counts.values())
+    classes = counts['class'].tolist()
+    values = counts['count'].tolist()
 
     fig, ax = plt.subplots(figsize=(10, 5))
     bars = ax.bar(classes, values, color='tab:blue')
@@ -56,9 +55,10 @@ def plot_counts(counts, out_png='reports/class_distribution.png'):
     # annotate counts on bars
     for bar, val in zip(bars, values):
         ax.text(bar.get_x() + bar.get_width() / 2, val, str(val), ha='center', va='bottom')
-
     plt.tight_layout()
-    fig.savefig(out_png)
+    # Save figure instead of showing (Agg backend is non-interactive)
+    os.makedirs(os.path.dirname(out_png), exist_ok=True)
+    plt.savefig(out_png, dpi=100, bbox_inches='tight')
     plt.close(fig)
 
 
@@ -76,7 +76,8 @@ def main():
 
     save_counts_csv(counts)
     plot_counts(counts)
-    print('\nSaved CSV to `reports/class_counts.csv` and plot to `reports/class_distribution.png`.')
+    print('\nSaved CSV to `reports/seg_counts.csv` and plot to'
+          ' `reports/class_distribution.png`.')
     return 0
 
 
