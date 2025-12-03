@@ -45,7 +45,7 @@ def load_image(fp, img_size):
     img = tf.io.read_file(fp)
     img = tf.image.decode_image(img, channels=3, expand_animations=False)
     img = tf.image.resize(img, (img_size, img_size))
-    img = tf.cast(img, tf.float32) # Removed /255
+    img = tf.cast(img, tf.float32)/255
     return img
 
 
@@ -74,8 +74,10 @@ def main():
     args = parse_args()
     os.makedirs(args.out, exist_ok=True)
     set_global_seed(args.seed)
-
-    df = pd.read_csv(args.csv, sep=';')  # added sep param
+    try:
+        df = pd.read_csv(args.csv, sep=',')
+    except:
+        df = pd.read_csv(args.csv, sep=';')
     encoder = LabelEncoder()
     encoder.fit(sorted(df["label"].unique()))
     with open(os.path.join(args.out, "labels.json"), "w") as f:
